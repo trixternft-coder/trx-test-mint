@@ -45,7 +45,7 @@
         );
 
         status.textContent = "Sending transaction...";
-        const tx = await contract.publicMint(1, { value: ethers.parseEther("0.004") });
+        const tx = await contract.publicMint(1, { value: ethers.parseEther("0.003") });
         status.textContent = "Waiting for confirmation...";
         await tx.wait();
 
