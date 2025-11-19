@@ -1,0 +1,18 @@
+{
+  "name": "trx-test-mint",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "ethers": "latest",
+    "@web3modal/ethereum": "latest",
+    "wagmi": "latest",
+    "viem": "latest"
+  }
+}
