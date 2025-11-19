@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRXTESTB Test Mint</title>
+  <script src="https://cdn.ethers.io/lib/ethers-6.13.1.umd.min.js"></script>
+  <style>
+    body { background: #0f0f0f; color: #fff; font-family: sans-serif; text-align: center; padding: 40px; min-height: 100vh; }
+    h1 { color: #00ff99; font-size: 3rem; }
+    img { border-radius: 20px; max-width: 400px; }
+    p { font-size: 1.5rem; margin: 30px; }
+    button { background: #00ff99; color: #000; font-size: 1.5rem; padding: 15px 40px; border: none; border-radius: 12px; cursor: pointer; margin: 10px; }
+    #status { margin-top: 30px; }
+    footer { font-size: 12px; margin-top: 50px; }
+  </style>
+</head>
+<body>
+  <h1>TRXTESTB</h1>
+  <img src="https://via.placeholder.com/400x400/00ff99/000000?text=TRXTESTB+Logo" alt="Logo">
+  <p>Price: 0.004 MATIC | Network: Polygon</p>
+  <button id="connectMint">Connect Wallet & Mint</button>
+  <p id="status">Ready to mint #2</p>
+  <footer>Base URI: ipfs://bafybeidgvmd7adx2umg7fuz2p4kx7tppn34pitzs33ilcndjt3x5gho75e/</footer>
+
+  <script>
+    const CONTRACT = '0x8963a229A573dC75ec5963e78E33732C6BE92C25';
+    const PRICE = ethers.parseEther('0.004');
+    const CHAIN_ID = 137;
+    const ABI = [
+      'function mint(uint256 quantity) public payable',
+      'function totalSupply() view returns (uint256)'
+    ];
+
+    const button = document.getElementById('connectMint');
+    const status = document.getElementById('status');
+
+    button.addEventListener('click', async () => {
+      if (!window.ethereum) return status.textContent = 'Install MetaMask!';
+
+      try {
+        status.textContent = 'Connecting...';
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        await provider.send('eth_requestAccounts', []);
+
+        const network = await provider.getNetwork();
+        if (Number(network.chainId) !== CHAIN_ID) {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x89' }] // Polygon hex
+          });
+        }
+
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(CONTRACT, ABI, signer);
+
+        status.textContent = 'Minting...';
+        const tx = await contract.mint(1, { value: PRICE });
+        await tx.wait();
+
+        status.textContent = `Minted! Tx: ${tx.hash.slice(0, 10)}...`;
+      } catch (e) {
+        status.textContent = `Error: ${e.message || e.shortMessage}`;
+      }
+    });
+  </script>
+</body>
+</html>
